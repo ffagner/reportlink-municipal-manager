@@ -45,6 +45,7 @@ const AdminReportManager: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('all');
+  const [newCategory, setNewCategory] = useState<string>('');
   
   // List of municipalities
   const municipalities = [
@@ -86,16 +87,18 @@ const AdminReportManager: React.FC = () => {
       title: '',
       description: '',
       url: '',
-      municipalityId: selectedMunicipality !== 'all' ? selectedMunicipality : 'all',
+      municipalityId: selectedMunicipality !== 'all' ? selectedMunicipality : 'mun1', // Default to first municipality
       category: '',
       date: new Date().toISOString().split('T')[0],
     };
     setCurrentReport(newReport);
+    setNewCategory('');
     setIsDialogOpen(true);
   };
 
   const handleEditReport = (report: Report) => {
     setCurrentReport({...report});
+    setNewCategory('');
     setIsDialogOpen(true);
   };
 
@@ -119,6 +122,11 @@ const AdminReportManager: React.FC = () => {
 
   const saveReport = () => {
     if (!currentReport) return;
+    
+    // Handle new category if selected
+    if (currentReport.category === 'nova' && newCategory) {
+      currentReport.category = newCategory;
+    }
     
     // Validate required fields
     if (!currentReport.title || !currentReport.url || !currentReport.municipalityId || !currentReport.category) {
@@ -361,10 +369,10 @@ const AdminReportManager: React.FC = () => {
                 </label>
                 <Input
                   id="newCategory"
-                  name="category"
+                  name="newCategory"
                   className="col-span-3"
-                  value=""
-                  onChange={handleInputChange}
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
                   placeholder="Digite o nome da nova categoria"
                 />
               </div>
@@ -383,11 +391,14 @@ const AdminReportManager: React.FC = () => {
                     <SelectValue placeholder="Selecione um município" />
                   </SelectTrigger>
                   <SelectContent>
-                    {municipalities.map(mun => (
-                      <SelectItem key={mun.id} value={mun.id}>
-                        {mun.name}
-                      </SelectItem>
-                    ))}
+                    {municipalities
+                      .filter(m => m.id !== 'all')
+                      .map(mun => (
+                        <SelectItem key={mun.id} value={mun.id}>
+                          {mun.name}
+                        </SelectItem>
+                      ))
+                    }
                   </SelectContent>
                 </Select>
               </div>
