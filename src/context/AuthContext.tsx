@@ -10,11 +10,13 @@ type User = {
   id: string;
   username: string;
   municipality: Municipality;
+  isAdmin?: boolean;
 };
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -37,7 +39,7 @@ const mockUsers = [
   { id: 'user3', username: 'bh', password: 'bh123', municipalityId: 'mun3' },
   { id: 'user4', username: 'salvador', password: 'sal123', municipalityId: 'mun4' },
   { id: 'user5', username: 'brasilia', password: 'bsb123', municipalityId: 'mun5' },
-  { id: 'admin', username: 'admin', password: 'admin', municipalityId: 'all' }, // Admin with access to all
+  { id: 'admin', username: 'admin', password: 'admin', municipalityId: 'all', isAdmin: true }, // Admin with access to all
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -73,7 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userWithMunicipality = {
         id: foundUser.id,
         username: foundUser.username,
-        municipality
+        municipality,
+        isAdmin: foundUser.isAdmin || false
       };
       
       setUser(userWithMunicipality);
@@ -90,7 +93,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      isAdmin: user?.isAdmin || false,
+      login, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
