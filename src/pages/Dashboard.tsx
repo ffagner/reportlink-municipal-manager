@@ -6,6 +6,7 @@ import Navigation from '@/components/Navigation';
 import ReportGrid from '@/components/ReportGrid';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Dashboard: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -28,6 +29,26 @@ const Dashboard: React.FC = () => {
     setError(error);
   };
 
+  // Função para mostrar esqueletos de carregamento
+  const renderSkeletons = () => {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map(i => (
+          <div key={i} className="bg-white rounded-lg border shadow-sm p-6">
+            <Skeleton className="h-4 w-3/4 mb-4" />
+            <Skeleton className="h-8 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Função para tentar novamente
+  const handleRetry = () => {
+    setError(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-16">
       <Navigation />
@@ -39,18 +60,16 @@ const Dashboard: React.FC = () => {
               <AlertTitle>Erro ao carregar relatórios</AlertTitle>
               <AlertDescription>
                 Ocorreu um problema ao carregar os relatórios. Por favor, tente novamente mais tarde.
+                <button 
+                  onClick={handleRetry} 
+                  className="ml-4 text-primary underline hover:text-primary/80"
+                >
+                  Tentar novamente
+                </button>
               </AlertDescription>
             </Alert>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="bg-white rounded-lg border shadow-sm p-6 animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                </div>
-              ))}
-            </div>
+            {renderSkeletons()}
           </div>
         ) : (
           <React.Suspense 

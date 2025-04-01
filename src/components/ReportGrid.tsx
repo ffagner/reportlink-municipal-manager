@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ReportCard from './ReportCard';
-import MunicipalitySelector from './MunicipalitySelector';
+import SafeMunicipalitySelector from './SafeMunicipalitySelector'; // Importando o componente seguro
 import { getReportsByMunicipality, getCategories, filterReportsByCategory, Report } from '@/lib/reportData';
 import AnimatedTransition from './AnimatedTransition';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,11 @@ const ReportGrid: React.FC = () => {
       const userReports = getReportsByMunicipality(municipalityId);
       setReports(userReports);
       setFilteredReports(userReports);
-      setCategories(getCategories());
+      
+      // Garantindo que não haja categorias vazias
+      const allCategories = getCategories();
+      const validCategories = allCategories.filter(cat => cat && cat.trim() !== '');
+      setCategories(validCategories);
     }
   }, [user]);
 
@@ -64,7 +68,7 @@ const ReportGrid: React.FC = () => {
       </AnimatedTransition>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-        <MunicipalitySelector
+        <SafeMunicipalitySelector
           selectedCategory={selectedCategory}
           categories={categories}
           onCategoryChange={handleCategoryChange}
